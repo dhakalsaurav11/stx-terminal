@@ -1,6 +1,6 @@
 # Stock Tracking Portal
 
-A personal, locally-hosted stock tracking portal with real-time data, interactive candlestick charts, integrated news sentiment, and a custom decision engine. This project was conceived and architected by me, the user, to provide a professional-grade trading dashboard tailored to individual needs.
+A personal, locally-hosted stock tracking portal with real-time data, interactive candlestick charts, integrated news sentiment, and a custom decision engine. This project was conceived and architected by me to provide a professional-grade trading dashboard tailored to individual needs.
 
 ---
 
