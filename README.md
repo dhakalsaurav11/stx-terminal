@@ -1,70 +1,151 @@
-# Getting Started with Create React App
+# Stock Tracking Portal
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A personal, locally-hosted stock tracking portal with real-time data, interactive candlestick charts, integrated news sentiment, and a custom decision engine. This project was conceived and architected by me, the user, to provide a professional-grade trading dashboard tailored to individual needs.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## Table of Contents
 
-### `npm start`
+- [Features](#features)
+- [Architecture Overview](#architecture-overview)
+- [Decision Engine](#decision-engine)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Configuration](#configuration)
+- [Extending the Project](#extending-the-project)
+- [License](#license)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+---
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Features
 
-### `npm test`
+- **Real-Time Data**: Fetches live stock prices and updates every few seconds.
+- **Candlestick Charts**: Interactive Plotly-based charts with automatic updates.
+- **News & Sentiment**: Retrieves latest news headlines and computes sentiment polarity.
+- **Decision Engine**: A proprietary engine combining multiple technical indicators and sentiment analysis to generate buy/sell/hold recommendations.
+- **Background Scheduler**: APScheduler automates data and news updates without blocking the UI.
+- **Responsive UI**: Bootstrap-based interface with modular cards for each stock.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+---
 
-### `npm run build`
+## Architecture Overview
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+1. **Data Collection**
+   - **Stock Prices**: Retrieved via `yfinance` (OHLC data) and stored in a local SQLite database.
+   - **News Articles**: Fetched from NewsAPI, enriched with sentiment scores (via TextBlob), and stored for historical reference.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+2. **Storage**
+   - **SQLite**: A lightweight, file-based database (`stock_data.db`) holds price and news records.
+   - **SQLAlchemy**: ORM layer for managing database models (`StockPrice`, `NewsArticle`).
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+3. **Scheduling**
+   - **APScheduler**: Runs background jobs every minute (prices) and every five minutes (news) to keep data fresh.
 
-### `npm run eject`
+4. **Web Server**
+   - **Flask**: Serves endpoints for charts (`/chartdata/<symbol>`), prices (`/price/<symbol>`), news (`/news/<symbol>`), and decisions (`/decision/<symbol>`).
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+5. **Front-End**
+   - **Bootstrap 4**: Responsive layout and styling.
+   - **Plotly.js**: Candlestick chart rendering and dynamic updates via AJAX.
+   - **JavaScript**: Handles polling logic for real-time prices, chart updates, news, and decision requests.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+---
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## Decision Engine
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+At the heart of the portal is a **custom decision engine**, a strategy I devised to mimic professional broker analysis:
 
-## Learn More
+1. **Simple Moving Averages (SMA)**: Short-term vs. long-term trend detection.
+2. **MACD**: Momentum oscillator and signal line crossover.
+3. **Bollinger Bands**: Volatility-based overbought/oversold signals.
+4. **RSI**: Overbought (>70) or oversold (<30) momentum indicator.
+5. **News Sentiment**: Polarity score averaged over the latest headlines.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Each indicator contributes a signal of `+1` (bullish), `-1` (bearish), or `0` (neutral). The sum yields a **total signal**, which maps to:
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+- `>= +3`: **Buy**
+- `<= -3`: **Sell**
+- Otherwise: **Hold**
 
-### Code Splitting
+The explanation for each recommendation is returned alongside the decision, providing transparency into how the engine arrived at its conclusion.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+---
 
-### Analyzing the Bundle Size
+## Installation
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/yourusername/stock-tracking-portal.git
+   cd stock-tracking-portal
+   ```
 
-### Making a Progressive Web App
+2. **Create a virtual environment**
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+3. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-### Advanced Configuration
+4. **Set environment variables**
+   - `NEWSAPI_KEY`: Your NewsAPI.org key.
+   ```bash
+   export NEWSAPI_KEY="your_key_here"
+   ```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+5. **Initialize the database**
+   ```bash
+   python app.py
+   ```
+   On first run, this creates `stock_data.db` and required tables.
 
-### Deployment
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+## Usage
 
-### `npm run build` fails to minify
+1. **Start the Flask server**
+   ```bash
+   python app.py
+   ```
+   The portal is available at `http://127.0.0.1:5000/`.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+2. **View Real-Time Dashboard**
+   - Observe live price updates and interactive charts.
+   - Read latest news and click **Get Decision** to see buy/sell/hold recommendations.
+
+3. **Back-End Endpoints**
+   - `/chartdata/<symbol>`: JSON OHLC data for charts.
+   - `/price/<symbol>`: Current market price.
+   - `/news/<symbol>`: Latest news and sentiment.
+   - `/decision/<symbol>`: Decision engine output.
+
+---
+
+## Configuration
+
+- **Polling Intervals**: Adjust in `index.html` JavaScript (`setInterval` calls).
+- **Scheduler Timing**: Modify APScheduler intervals in `app.py`.
+- **Indicators & Thresholds**: Update logic in `/decision/<symbol>` route.
+
+---
+
+## Extending the Project
+
+- **Add Indicators**: Integrate ADX, VWAP, or custom chart patterns.
+- **Advanced Sentiment**: Swap TextBlob for transformer-based models (e.g., BERT).
+- **Machine Learning**: Train a classifier/regressor on historical signals and price movements.
+- **Authentication**: Secure the portal with user login and preferences.
+
+---
+
+## License
+
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+
+---
+
+*Created by me, as the original architect of this decision engine and portal.*
+
