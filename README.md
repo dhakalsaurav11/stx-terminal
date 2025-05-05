@@ -147,5 +147,5 @@ This project is licensed under the MIT License. See [LICENSE](LICENSE) for detai
 
 ---
 
-*Created by me, as the original architect of this decision engine and portal.*
+*Created by Saurav Dhakal, the original architect of this decision engine and portal.*
 
