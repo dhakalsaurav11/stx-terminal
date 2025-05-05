@@ -8,7 +8,21 @@ STX-Terminal is a real-time stock tracking portal built for serious traders, ent
 - News aggregation with sentiment analysis
 - AI-driven Decision Engine that provides Buy/Hold/Sell calls
 
-Designed and developed by Saurav Dhakal, this portal is powered by an original decision engine concept combining technical analysis with live market sentiment.
+Designed and developed by Saurav Dhakal, this portal is powered by an original Decision Engine concept combining technical analysis with live market sentiment.
+
+## Live Preview
+
+### Dashboard
+![Candlestick Charts](assets/dashboard.png)
+
+### Dashboard with Candlestick Charts
+![Candlestick Charts](assets/dashboard.png)
+
+### AI Decision Output (API)
+![Decision Engine JSON](assets/decision-api.png)
+
+### News Sentiment & Feed
+![News Panel](assets/news-panel.png)
 
 ---
 
